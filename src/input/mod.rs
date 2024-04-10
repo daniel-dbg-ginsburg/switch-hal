@@ -1,7 +1,7 @@
 use crate::{ActiveHigh, ActiveLow, InputSwitch, Switch};
 use embedded_hal::digital::{ErrorType, InputPin};
 
-impl<T: InputPin + ErrorType> InputSwitch for Switch<T, ActiveHigh> {
+impl<T: InputPin> InputSwitch for Switch<T, ActiveHigh> {
     type Error = <T as ErrorType>::Error;
 
     fn is_active(&mut self) -> Result<bool, Self::Error> {

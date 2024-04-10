@@ -2,7 +2,7 @@ use embedded_hal::digital::{ErrorType, OutputPin, StatefulOutputPin};
 
 use crate::{ActiveHigh, ActiveLow, OutputSwitch, Switch, StatefulOutputSwitch, ToggleableOutputSwitch};
 
-impl<T: OutputPin + ErrorType> OutputSwitch for Switch<T, ActiveHigh> {
+impl<T: OutputPin> OutputSwitch for Switch<T, ActiveHigh> {
     type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
@@ -14,7 +14,7 @@ impl<T: OutputPin + ErrorType> OutputSwitch for Switch<T, ActiveHigh> {
     }
 }
 
-impl<T: OutputPin + ErrorType> OutputSwitch for Switch<T, ActiveLow> {
+impl<T: OutputPin> OutputSwitch for Switch<T, ActiveLow> {
     type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
@@ -36,7 +36,7 @@ impl<T: OutputPin + StatefulOutputPin, ActiveLevel> ToggleableOutputSwitch
     }
 }
 
-impl<T: OutputPin + StatefulOutputPin + ErrorType> StatefulOutputSwitch
+impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch
     for Switch<T, ActiveLow>
 {
     type Error = <T as ErrorType>::Error;
