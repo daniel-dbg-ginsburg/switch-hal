@@ -15,7 +15,7 @@ mod active_high_switch {
         fn true_when_pin_high() {
             let pin = Pin::with_state(State::High);
 
-            let button = Switch::<_, ActiveHigh>::new(pin);
+            let mut button = Switch::<_, ActiveHigh>::new(pin);
             assert_eq!(true, button.is_active().unwrap());
         }
 
@@ -23,14 +23,14 @@ mod active_high_switch {
         fn false_when_pin_low() {
             let pin = Pin::with_state(State::Low);
 
-            let button = Switch::<_, ActiveHigh>::new(pin);
+            let mut button = Switch::<_, ActiveHigh>::new(pin);
             assert_eq!(false, button.is_active().unwrap());
         }
 
         #[test]
         fn propagates_errors_from_pin() {
             let pin = Pin::new();
-            let button = Switch::<_, ActiveHigh>::new(pin);
+            let mut button = Switch::<_, ActiveHigh>::new(pin);
             button.is_active().expect_err("Expected uninitialized error");
         }
     }
@@ -48,7 +48,7 @@ mod active_low_switch {
         fn false_when_pin_high() {
             let pin = Pin::with_state(State::High);
 
-            let button = Switch::<_, ActiveLow>::new(pin);
+            let mut button = Switch::<_, ActiveLow>::new(pin);
             assert_eq!(false, button.is_active().unwrap());
         }
 
@@ -56,14 +56,14 @@ mod active_low_switch {
         fn true_when_pin_low() {
             let pin = Pin::with_state(State::Low);
 
-            let button = Switch::<_, ActiveLow>::new(pin);
+            let mut button = Switch::<_, ActiveLow>::new(pin);
             assert_eq!(true, button.is_active().unwrap());
         }
 
         #[test]
         fn propagates_errors_from_pin() {
             let pin = Pin::new();
-            let button = Switch::<_, ActiveLow>::new(pin);
+            let mut button = Switch::<_, ActiveLow>::new(pin);
             button.is_active().expect_err("Expected uninitialized error");
         }
     }

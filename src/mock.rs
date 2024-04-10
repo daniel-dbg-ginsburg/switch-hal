@@ -5,8 +5,8 @@
 //!
 //! This is part of the main crate so it is accessible to doctests.
 //! Otherwise, I would have created a tests/mock/mod.rs file.
-use embedded_hal::digital::v2::toggleable;
-use embedded_hal::digital::v2::{InputPin, OutputPin, StatefulOutputPin};
+
+use embedded_hal::digital::{ErrorType, InputPin, OutputPin, StatefulOutputPin};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum State {
@@ -28,20 +28,30 @@ impl Pin {
     }
 }
 
-type MockError = &'static str;
+#[derive(Debug)]
+#[allow(dead_code)]
+pub struct MockError(&'static str);
+
+impl embedded_hal::digital::Error for MockError {
+    fn kind(&self) -> embedded_hal::digital::ErrorKind {
+        embedded_hal::digital::ErrorKind::Other
+    }
+}
+
+impl ErrorType for Pin {
+    type Error = MockError;
+}
 
 impl InputPin for Pin {
-    type Error = MockError;
-
-    fn is_high(&self) -> Result<bool, Self::Error> {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
         match self.state {
             Some(State::High) => Ok(true),
             Some(State::Low) => Ok(false),
-            None => Err("state not set"),
+            None => Err(MockError("state not set")),
         }
     }
 
-    fn is_low(&self) -> Result<bool, Self::Error> {
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
         match self.is_high() {
             Ok(v) => Ok(!v),
             Err(e) => Err(e),
@@ -50,8 +60,6 @@ impl InputPin for Pin {
 }
 
 impl OutputPin for Pin {
-    type Error = MockError;
-
     fn set_low(&mut self) -> Result<(), Self::Error> {
         self.state = Some(State::Low);
         Ok(())
@@ -64,16 +72,16 @@ impl OutputPin for Pin {
 }
 
 impl StatefulOutputPin for Pin {
-    fn is_set_low(&self) -> Result<bool, Self::Error> {
+    fn is_set_low(&mut self) -> Result<bool, Self::Error> {
         self.is_low()
     }
 
-    fn is_set_high(&self) -> Result<bool, Self::Error> {
+    fn is_set_high(&mut self) -> Result<bool, Self::Error> {
         self.is_high()
     }
 }
 
-impl toggleable::Default for Pin {}
+// impl toggleable::Default for Pin {}
 
 #[cfg(test)]
 mod test {
@@ -84,7 +92,7 @@ mod test {
 
         #[test]
         fn state_is_uninitialized() {
-            let pin = Pin::new();
+            let mut pin = Pin::new();
             assert_eq!(None, pin.state);
             pin.is_low().expect_err("Expected uninitialized pin");
         }
@@ -95,7 +103,7 @@ mod test {
 
         #[test]
         fn error_when_uninitialized() {
-            let pin = Pin { state: None };
+            let mut pin = Pin { state: None };
             pin.is_high().expect_err("Expected uninitialized pin");
         }
 
@@ -104,13 +112,13 @@ mod test {
 
             #[test]
             fn returns_true_when_state_is_high() {
-                let pin = Pin::with_state(State::High);
+                let mut pin = Pin::with_state(State::High);
                 assert_eq!(true, pin.is_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
-                let pin = Pin::with_state(State::Low);
+                let mut pin = Pin::with_state(State::Low);
                 assert_eq!(false, pin.is_high().unwrap());
             }
         }
@@ -120,13 +128,13 @@ mod test {
 
             #[test]
             fn returns_false_when_state_is_high() {
-                let pin = Pin::with_state(State::High);
+                let mut pin = Pin::with_state(State::High);
                 assert_eq!(false, pin.is_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
-                let pin = Pin::with_state(State::Low);
+                let mut pin = Pin::with_state(State::Low);
                 assert_eq!(true, pin.is_low().unwrap());
             }
         }
@@ -157,7 +165,7 @@ mod test {
 
         #[test]
         fn error_when_uninitialized() {
-            let pin = Pin { state: None };
+            let mut pin = Pin { state: None };
             pin.is_set_high().expect_err("Expected uninitialized pin");
         }
 
@@ -166,13 +174,13 @@ mod test {
 
             #[test]
             fn returns_false_when_state_is_high() {
-                let pin = Pin::with_state(State::High);
+                let mut pin = Pin::with_state(State::High);
                 assert_eq!(false, pin.is_set_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
-                let pin = Pin::with_state(State::Low);
+                let mut pin = Pin::with_state(State::Low);
                 assert_eq!(true, pin.is_set_low().unwrap());
             }
         }
@@ -182,20 +190,20 @@ mod test {
 
             #[test]
             fn returns_true_when_state_is_high() {
-                let pin = Pin::with_state(State::High);
+                let mut pin = Pin::with_state(State::High);
                 assert_eq!(true, pin.is_set_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
-                let pin = Pin::with_state(State::Low);
+                let mut pin = Pin::with_state(State::Low);
                 assert_eq!(false, pin.is_set_high().unwrap());
             }
         }
 
         mod toggleable {
             use super::*;
-            use embedded_hal::digital::v2::ToggleableOutputPin;
+            use embedded_hal::digital::StatefulOutputPin;
 
             #[test]
             fn default_toggleable_impl() {

@@ -4,7 +4,7 @@ use switch_hal::IntoSwitch;
 mod output_pin {
     use super::*;
 
-    use embedded_hal::digital::v2::InputPin;
+    use embedded_hal::digital::InputPin;
     use switch_hal::OutputSwitch;
 
     #[test]
@@ -13,7 +13,7 @@ mod output_pin {
         let mut switch = pin.into_active_high_switch();
         switch.on().unwrap();
 
-        let pin = switch.into_pin();
+        let mut pin = switch.into_pin();
         assert_eq!(true, pin.is_high().unwrap());
     }
 
@@ -23,7 +23,7 @@ mod output_pin {
         let mut switch = pin.into_active_low_switch();
         switch.on().unwrap();
 
-        let pin = switch.into_pin();
+        let mut pin = switch.into_pin();
         assert_eq!(true, pin.is_low().unwrap());
     }
 }
@@ -35,14 +35,14 @@ mod input_pin {
     #[test]
     fn active_high() {
         let pin = Pin::with_state(State::High);
-        let switch = pin.into_active_high_switch();
+        let mut switch = pin.into_active_high_switch();
         assert_eq!(true, switch.is_active().unwrap());
     }
 
     #[test]
     fn active_low() {
         let pin = Pin::with_state(State::Low);
-        let switch = pin.into_active_low_switch();
+        let mut switch = pin.into_active_low_switch();
         assert_eq!(true, switch.is_active().unwrap());
     }
 }

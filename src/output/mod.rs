@@ -1,9 +1,9 @@
-use embedded_hal::digital::v2::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
+use embedded_hal::digital::{ErrorType, OutputPin, StatefulOutputPin};
 
 use crate::{ActiveHigh, ActiveLow, OutputSwitch, Switch, StatefulOutputSwitch, ToggleableOutputSwitch};
 
-impl<T: OutputPin> OutputSwitch for Switch<T, ActiveHigh> {
-    type Error = <T as OutputPin>::Error;
+impl<T: OutputPin + ErrorType> OutputSwitch for Switch<T, ActiveHigh> {
+    type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
         self.pin.set_high()
@@ -14,8 +14,8 @@ impl<T: OutputPin> OutputSwitch for Switch<T, ActiveHigh> {
     }
 }
 
-impl<T: OutputPin> OutputSwitch for Switch<T, ActiveLow> {
-    type Error = <T as OutputPin>::Error;
+impl<T: OutputPin + ErrorType> OutputSwitch for Switch<T, ActiveLow> {
+    type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
         self.pin.set_low()
@@ -26,20 +26,20 @@ impl<T: OutputPin> OutputSwitch for Switch<T, ActiveLow> {
     }
 }
 
-impl<T: OutputPin + ToggleableOutputPin, ActiveLevel> ToggleableOutputSwitch
+impl<T: OutputPin + StatefulOutputPin, ActiveLevel> ToggleableOutputSwitch
     for Switch<T, ActiveLevel>
 {
-    type Error = <T as ToggleableOutputPin>::Error;
+    type Error = <T as ErrorType>::Error;
 
     fn toggle(&mut self) -> Result<(), Self::Error> {
         self.pin.toggle()
     }
 }
 
-impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch
+impl<T: OutputPin + StatefulOutputPin + ErrorType> StatefulOutputSwitch
     for Switch<T, ActiveLow>
 {
-    type Error = <T as OutputPin>::Error;
+    type Error = <T as ErrorType>::Error;
 
     fn is_on(&mut self) -> Result<bool, Self::Error> {
         self.pin.is_set_low()
@@ -53,7 +53,7 @@ impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch
 impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch
     for Switch<T, ActiveHigh>
 {
-    type Error = <T as OutputPin>::Error;
+    type Error = <T as ErrorType>::Error;
 
     fn is_on(&mut self) -> Result<bool, Self::Error> {
         self.pin.is_set_high()

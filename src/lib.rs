@@ -19,14 +19,14 @@ pub trait InputSwitch {
     /// use switch_hal::{InputSwitch, OutputSwitch, Switch, IntoSwitch};
     /// # let pin = mock::Pin::with_state(mock::State::High);
     /// # let mut status_led = mock::Pin::new().into_active_high_switch();
-    /// let button = pin.into_active_low_switch();
+    /// let mut button = pin.into_active_low_switch();
     /// match button.is_active() {
     ///     Ok(true) => { status_led.on().ok(); }
     ///     Ok(false) => { status_led.off().ok(); }
     ///     Err(_) => { panic!("Failed to read button state"); }
     /// }
     /// ```
-    fn is_active(&self) -> Result<bool, Self::Error>;
+    fn is_active(&mut self) -> Result<bool, Self::Error>;
 }
 
 /// Represents an output switch, such as a LED "switch" or transistor
