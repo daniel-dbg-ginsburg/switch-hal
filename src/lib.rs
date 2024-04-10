@@ -63,11 +63,11 @@ pub trait OutputSwitch {
 /// Toggles the switch from it's current state to it's opposite state.
 ///
 /// # Notes
-/// This is only available if the underlying hal has implemented [ToggleableOutputPin](embedded_hal::digital::v2::ToggleableOutputPin)
+/// This is only available if the underlying hal has implemented [StatefulOutputPin](embedded_hal::digital::StatefulOutputPin)
 pub trait ToggleableOutputSwitch {
     type Error;
 
-    /// Toggles the current state of the [OutputSwitch](OutputSwitch)
+    /// Toggles the current state of the [OutputSwitch]
     ///
     /// # Examples
     ///
@@ -84,7 +84,7 @@ pub trait ToggleableOutputSwitch {
 /// Checks current switch state
 ///
 /// # Notes
-/// This is only available if the underlying hal has implemented [StatefulOutputPin](embedded_hal::digital::v2::StatefulOutputPin)
+/// This is only available if the underlying hal has implemented [StatefulOutputPin](embedded_hal::digital::StatefulOutputPin)
 pub trait StatefulOutputSwitch {
     type Error;
 
@@ -127,10 +127,10 @@ use core::marker::PhantomData;
 /// Concrete implementation for [InputSwitch](trait.InputSwitch.html) and [OutputSwitch](trait.OutputSwitch.html)
 ///
 /// # Type Params
-/// - `IoPin` must be a type that implements either of the [InputPin](embedded_hal::digital::v2::InputPin) or [OutputPin](embedded_hal::digital::v2::OutputPin) traits.
-/// - `ActiveLevel` indicates whether the `Switch` is [ActiveHigh](ActiveHigh) or [ActiveLow](ActiveLow).
+/// - `IoPin` must be a type that implements either of the [InputPin](embedded_hal::digital::InputPin) or [OutputPin](embedded_hal::digital::OutputPin) traits.
+/// - `ActiveLevel` indicates whether the `Switch` is [ActiveHigh] or [ActiveLow].
 ///     `ActiveLevel` is not actually stored in the struct.
-///     It's [PhantomData](core::marker::PhantomData) used to indicate which implementation to use.
+///     It's [PhantomData] used to indicate which implementation to use.
 pub struct Switch<IoPin, ActiveLevel> {
     pin: IoPin,
     active: PhantomData<ActiveLevel>,
@@ -138,7 +138,7 @@ pub struct Switch<IoPin, ActiveLevel> {
 
 impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
     /// Constructs a new [Switch](struct.Switch.html) from a concrete implementation of an
-    /// [InputPin](embedded_hal::digital::v2::InputPin) or [OutputPin](embedded_hal::digital::v2::OutputPin)
+    /// [InputPin](embedded_hal::digital::InputPin) or [OutputPin](embedded_hal::digital::OutputPin)
     ///
     /// **Prefer the [IntoSwitch](trait.IntoSwitch.html) trait over calling [new](#method.new) directly.**
     ///
@@ -188,7 +188,7 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
         }
     }
 
-    /// Consumes the [Switch](struct.Switch.html) and returns the underlying [InputPin](embedded_hal::digital::v2::InputPin) or [OutputPin](embedded_hal::digital::v2::OutputPin).
+    /// Consumes the [Switch](struct.Switch.html) and returns the underlying [InputPin](embedded_hal::digital::InputPin) or [OutputPin](embedded_hal::digital::OutputPin).
     ///
     /// This is useful fore retrieving the underlying pin to use it for a different purpose.
     ///
@@ -208,13 +208,13 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
     }
 }
 
-/// Convenience functions for converting [InputPin](embedded_hal::digital::v2::InputPin)
-/// and [OutputPin](embedded_hal::digital::v2::OutputPin) to a [Switch](struct.Switch.html).
+/// Convenience functions for converting [InputPin](embedded_hal::digital::InputPin)
+/// and [OutputPin](embedded_hal::digital::OutputPin) to a [Switch](struct.Switch.html).
 ///
 /// The type of [Switch](struct.Switch.html) returned,
 /// [InputSwitch](trait.InputSwitch.html) or [OutputSwitch](trait.OutputSwitch.html) is
-/// determined by whether the `IoPin` being consumed is an [InputPin](embedded_hal::digital::v2::InputPin)
-/// or [OutputPin](embedded_hal::digital::v2::OutputPin).
+/// determined by whether the `IoPin` being consumed is an [InputPin](embedded_hal::digital::InputPin)
+/// or [OutputPin](embedded_hal::digital::OutputPin).
 pub trait IntoSwitch {
 
     /// Consumes the `IoPin` returning a [Switch](struct.Switch.html) of the appropriate `ActiveLevel`.
