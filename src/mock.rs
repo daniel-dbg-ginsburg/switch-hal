@@ -6,7 +6,10 @@
 //! This is part of the main crate so it is accessible to doctests.
 //! Otherwise, I would have created a tests/mock/mod.rs file.
 
+use core::{future::poll_fn, task::Poll};
+
 use embedded_hal::digital::{ErrorType, InputPin, OutputPin, StatefulOutputPin};
+use embedded_hal_async::digital::Wait;
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum State {
@@ -16,6 +19,12 @@ pub enum State {
 
 pub struct Pin {
     state: Option<State>,
+}
+
+impl Default for Pin {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Pin {
@@ -81,7 +90,47 @@ impl StatefulOutputPin for Pin {
     }
 }
 
-// impl toggleable::Default for Pin {}
+impl Wait for Pin {
+    async fn wait_for_high(&mut self) -> Result<(), Self::Error> {
+        poll_fn(|_cx| {
+            if self.state == Some(State::High) {
+                Poll::Ready(Ok(()))
+            } else {
+                Poll::Pending
+            }
+        })
+        .await
+    }
+
+    async fn wait_for_low(&mut self) -> Result<(), Self::Error> {
+        poll_fn(|_cx| {
+            if self.state == Some(State::Low) {
+                Poll::Ready(Ok(()))
+            } else {
+                Poll::Pending
+            }
+        })
+        .await
+    }
+
+    async fn wait_for_rising_edge(&mut self) -> Result<(), Self::Error> {
+        self.wait_for_low().await?;
+        self.wait_for_high().await
+    }
+
+    async fn wait_for_falling_edge(&mut self) -> Result<(), Self::Error> {
+        self.wait_for_high().await?;
+        self.wait_for_low().await
+    }
+
+    async fn wait_for_any_edge(&mut self) -> Result<(), Self::Error> {
+        if self.is_high()? {
+            self.wait_for_falling_edge().await
+        } else {
+            self.wait_for_rising_edge().await
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {
@@ -136,6 +185,75 @@ mod test {
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::Low);
                 assert_eq!(true, pin.is_low().unwrap());
+            }
+        }
+
+        mod asynch {
+            use core::future::Future;
+            use core::pin::pin;
+            use core::task::Context;
+            use noop_waker::noop_waker;
+
+            use super::*;
+
+            #[test]
+            fn wait_for_high_while_high() {
+                let mut pin = Pin::with_state(State::High);
+                let mut future = pin!(pin.wait_for_high());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)))
+            }
+
+            #[test]
+            fn wait_for_high_while_low() {
+                let mut pin = Pin::with_state(State::Low);
+                let mut future = pin!(pin.wait_for_high());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+            }
+
+            #[test]
+            fn wait_for_low_while_low() {
+                let mut pin = Pin::with_state(State::Low);
+                let mut future = pin!(pin.wait_for_low());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)));
+            }
+
+            #[test]
+            fn wait_for_low_while_high() {
+                let mut pin = Pin::with_state(State::High);
+                let mut future = pin!(pin.wait_for_low());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+            }
+
+            #[test]
+            fn wait_for_any_edge_while_high() {
+                let mut pin = Pin::with_state(State::High);
+                let mut future = pin!(pin.wait_for_any_edge());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+            }
+            
+            #[test]
+            fn wait_for_any_edge_while_low() {
+                let mut pin = Pin::with_state(State::Low);
+                let mut future = pin!(pin.wait_for_any_edge());
+                let waker = noop_waker();
+                let mut cx = Context::from_waker(&waker);
+
+                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
             }
         }
     }

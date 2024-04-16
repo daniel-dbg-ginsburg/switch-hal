@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(async_fn_in_trait)]
 
 mod input;
 mod output;
@@ -27,6 +28,15 @@ pub trait InputSwitch {
     /// }
     /// ```
     fn is_active(&mut self) -> Result<bool, Self::Error>;
+}
+
+#[cfg(feature = "async")]
+pub trait WaitableInputSwitch {
+    type Error;
+
+    async fn wait_for_active(&mut self) -> Result<(), Self::Error>;
+    async fn wait_for_inactive(&mut self) -> Result<(), Self::Error>;
+    async fn wait_for_change(&mut self) -> Result<(), Self::Error>;
 }
 
 /// Represents an output switch, such as a LED "switch" or transistor
@@ -183,7 +193,7 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
     /// ```
     pub fn new(pin: IoPin) -> Self {
         Switch {
-            pin: pin,
+            pin,
             active: PhantomData::<ActiveLevel>,
         }
     }
@@ -216,7 +226,6 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
 /// determined by whether the `IoPin` being consumed is an [InputPin](embedded_hal::digital::InputPin)
 /// or [OutputPin](embedded_hal::digital::OutputPin).
 pub trait IntoSwitch {
-
     /// Consumes the `IoPin` returning a [Switch](struct.Switch.html) of the appropriate `ActiveLevel`.
     ///
     /// This method exists so other, more convenient functions, can have blanket implementations.  
