@@ -14,7 +14,7 @@ mod output_pin {
         switch.on().unwrap();
 
         let mut pin = switch.into_pin();
-        assert_eq!(true, pin.is_high().unwrap());
+        assert!(pin.is_high().unwrap());
     }
 
     #[test]
@@ -24,7 +24,7 @@ mod output_pin {
         switch.on().unwrap();
 
         let mut pin = switch.into_pin();
-        assert_eq!(true, pin.is_low().unwrap());
+        assert!(pin.is_low().unwrap());
     }
 }
 
@@ -36,13 +36,13 @@ mod input_pin {
     fn active_high() {
         let pin = Pin::with_state(State::High);
         let mut switch = pin.into_active_high_switch();
-        assert_eq!(true, switch.is_active().unwrap());
+        assert!(switch.is_active().unwrap());
     }
 
     #[test]
     fn active_low() {
         let pin = Pin::with_state(State::Low);
         let mut switch = pin.into_active_low_switch();
-        assert_eq!(true, switch.is_active().unwrap());
+        assert!(switch.is_active().unwrap());
     }
 }

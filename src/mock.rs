@@ -6,9 +6,8 @@
 //! This is part of the main crate so it is accessible to doctests.
 //! Otherwise, I would have created a tests/mock/mod.rs file.
 
-use core::{future::poll_fn, task::Poll};
-
 use embedded_hal::digital::{ErrorType, InputPin, OutputPin, StatefulOutputPin};
+#[cfg(feature = "async")]
 use embedded_hal_async::digital::Wait;
 
 #[derive(PartialEq, Eq, Debug)]
@@ -90,6 +89,7 @@ impl StatefulOutputPin for Pin {
     }
 }
 
+#[cfg(feature = "async")]
 impl Wait for Pin {
     async fn wait_for_high(&mut self) -> Result<(), Self::Error> {
         poll_fn(|_cx| {
@@ -162,13 +162,13 @@ mod test {
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert_eq!(true, pin.is_high().unwrap());
+                assert!(pin.is_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
                 let mut pin = Pin::with_state(State::Low);
-                assert_eq!(false, pin.is_high().unwrap());
+                assert!(!pin.is_high().unwrap());
             }
         }
 
@@ -178,16 +178,17 @@ mod test {
             #[test]
             fn returns_false_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert_eq!(false, pin.is_low().unwrap());
+                assert!(!pin.is_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::Low);
-                assert_eq!(true, pin.is_low().unwrap());
+                assert!(pin.is_low().unwrap());
             }
         }
 
+        #[cfg(feature = "async")]
         mod asynch {
             use core::future::Future;
             use core::pin::pin;
@@ -266,7 +267,7 @@ mod test {
             let mut pin = Pin::new();
             pin.set_low().unwrap();
 
-            assert_eq!(true, pin.is_low().unwrap());
+            assert!(pin.is_low().unwrap());
         }
 
         #[test]
@@ -274,7 +275,7 @@ mod test {
             let mut pin = Pin::new();
             pin.set_high().unwrap();
 
-            assert_eq!(true, pin.is_high().unwrap());
+            assert!(pin.is_high().unwrap());
         }
     }
 
@@ -293,13 +294,13 @@ mod test {
             #[test]
             fn returns_false_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert_eq!(false, pin.is_set_low().unwrap());
+                assert!(!pin.is_set_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::Low);
-                assert_eq!(true, pin.is_set_low().unwrap());
+                assert!(pin.is_set_low().unwrap());
             }
         }
 
@@ -309,13 +310,13 @@ mod test {
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert_eq!(true, pin.is_set_high().unwrap());
+                assert!(pin.is_set_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
                 let mut pin = Pin::with_state(State::Low);
-                assert_eq!(false, pin.is_set_high().unwrap());
+                assert!(!pin.is_set_high().unwrap());
             }
         }
 
@@ -327,7 +328,7 @@ mod test {
             fn default_toggleable_impl() {
                 let mut pin = Pin::with_state(State::Low);
                 pin.toggle().unwrap();
-                assert_eq!(true, pin.is_set_high().unwrap());
+                assert!(pin.is_set_high().unwrap());
             }
         }
     }

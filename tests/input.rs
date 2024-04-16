@@ -16,7 +16,7 @@ mod active_high_switch {
             let pin = Pin::with_state(State::High);
 
             let mut button = Switch::<_, ActiveHigh>::new(pin);
-            assert_eq!(true, button.is_active().unwrap());
+            assert!(button.is_active().unwrap());
         }
 
         #[test]
@@ -24,7 +24,7 @@ mod active_high_switch {
             let pin = Pin::with_state(State::Low);
 
             let mut button = Switch::<_, ActiveHigh>::new(pin);
-            assert_eq!(false, button.is_active().unwrap());
+            assert!(!button.is_active().unwrap());
         }
 
         #[test]
@@ -51,7 +51,7 @@ mod active_low_switch {
             let pin = Pin::with_state(State::High);
 
             let mut button = Switch::<_, ActiveLow>::new(pin);
-            assert_eq!(false, button.is_active().unwrap());
+            assert!(!button.is_active().unwrap());
         }
 
         #[test]
@@ -59,7 +59,7 @@ mod active_low_switch {
             let pin = Pin::with_state(State::Low);
 
             let mut button = Switch::<_, ActiveLow>::new(pin);
-            assert_eq!(true, button.is_active().unwrap());
+            assert!(button.is_active().unwrap());
         }
 
         #[test]
