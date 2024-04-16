@@ -1,3 +1,25 @@
+//! Switch-HAL is a no_std embedded Rust library for working with buttons, switches, LEDs, and transistors. Basically, anything that acts like a switch, whether an input or output.
+//! 
+//! It is both a driver that uses the embedded-hal::digital traits and is an abstraction in it's own right. It provides a simple, zero-cost, abstraction to clarify the intent of your application code.
+//! 
+//! Why Switch-HAL? Why not just use raw GPIO?
+//! Did you mean to drive that line high?
+//! Or did you mean to turn that LED off?
+//! Wait a second... is that LED active high?
+//! Where's the schematic?
+//! Okay... cathode is wired to the input line... that means it's active low.
+//! 
+//! Now repeat this every place in your code where you need to turn that LED on or off.
+//! What happens when the hardware changes?
+//! Using the raw GPIO to set pins high and low will have you making changes all over your code base.
+//! 
+//! Wouldn't it be nicer if you only had to think about that once, when you initialize your application,
+//! and from then on out, simply called led.on() or led.off().
+//! Having an abstraction at the proper level reduces cognitive load.
+//! Specifying whether a simple peripheral is active high or low in a single place in your application reduces the maintenance burden.
+//! 
+//! "Async" feature enables async support for input switches.
+
 #![no_std]
 #![allow(async_fn_in_trait)]
 
@@ -31,11 +53,18 @@ pub trait InputSwitch {
 }
 
 #[cfg(feature = "async")]
+/// Represents an input switch that can be asynchronously waited for
 pub trait WaitableInputSwitch {
     type Error;
 
+    /// Waits until the switch becomes active. If the switch in already active, returns immediately
+    /// 
     async fn wait_for_active(&mut self) -> Result<(), Self::Error>;
+    /// Waits until the switch becomes inactive. If the switch is already inactive, returns immediately
+    /// 
     async fn wait_for_inactive(&mut self) -> Result<(), Self::Error>;
+    /// Waits until the switch changess from active to inactive, or from inactive to active
+    /// 
     async fn wait_for_change(&mut self) -> Result<(), Self::Error>;
 }
 

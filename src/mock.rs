@@ -9,6 +9,8 @@
 use embedded_hal::digital::{ErrorType, InputPin, OutputPin, StatefulOutputPin};
 #[cfg(feature = "async")]
 use embedded_hal_async::digital::Wait;
+#[cfg(feature = "async")]
+use core::{future::poll_fn, task::Poll};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum State {
@@ -192,7 +194,7 @@ mod test {
         mod asynch {
             use core::future::Future;
             use core::pin::pin;
-            use core::task::Context;
+            use core::task::{Context, Poll};
             use noop_waker::noop_waker;
 
             use super::*;
