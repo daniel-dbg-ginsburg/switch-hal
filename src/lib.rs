@@ -117,7 +117,7 @@ pub trait StatefulOutputSwitch {
     /// # let pin = mock::Pin::new();
     /// let mut led = pin.into_active_high_switch();
     /// led.off().ok();
-    /// assert!(!led.is_on().unwrap());
+    /// assert_eq!(false, led.is_on().unwrap());
     /// ```
     fn is_on(&mut self) -> Result<bool, Self::Error>;
 
@@ -131,7 +131,7 @@ pub trait StatefulOutputSwitch {
     /// # let pin = mock::Pin::new();
     /// let mut led = pin.into_active_high_switch();
     /// led.off().ok();
-    /// assert!(led.is_off().unwrap());
+    /// assert_eq!(true, led.is_off().unwrap());
     /// ```
     fn is_off(&mut self) -> Result<bool, Self::Error>;
 }

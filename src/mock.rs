@@ -6,6 +6,8 @@
 //! This is part of the main crate so it is accessible to doctests.
 //! Otherwise, I would have created a tests/mock/mod.rs file.
 
+#![allow(clippy::bool_assert_comparison)]
+
 use embedded_hal::digital::{ErrorType, InputPin, OutputPin, StatefulOutputPin};
 #[cfg(feature = "async")]
 use embedded_hal_async::digital::Wait;
@@ -164,13 +166,13 @@ mod test {
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert!(pin.is_high().unwrap());
+                assert_eq!(true, pin.is_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
                 let mut pin = Pin::with_state(State::Low);
-                assert!(!pin.is_high().unwrap());
+                assert_eq!(false, pin.is_high().unwrap());
             }
         }
 
@@ -180,13 +182,13 @@ mod test {
             #[test]
             fn returns_false_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert!(!pin.is_low().unwrap());
+                assert_eq!(false, pin.is_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::Low);
-                assert!(pin.is_low().unwrap());
+                assert_eq!(true, pin.is_low().unwrap());
             }
         }
 
@@ -206,7 +208,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)))
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)))
             }
 
             #[test]
@@ -216,7 +218,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Pending));
             }
 
             #[test]
@@ -226,7 +228,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)));
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Ready(_)));
             }
 
             #[test]
@@ -236,7 +238,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Pending));
             }
 
             #[test]
@@ -246,7 +248,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Pending));
             }
             
             #[test]
@@ -256,7 +258,7 @@ mod test {
                 let waker = noop_waker();
                 let mut cx = Context::from_waker(&waker);
 
-                assert!(matches!(future.as_mut().poll(&mut cx), Poll::Pending));
+                assert_eq!(true, matches!(future.as_mut().poll(&mut cx), Poll::Pending));
             }
         }
     }
@@ -269,7 +271,7 @@ mod test {
             let mut pin = Pin::new();
             pin.set_low().unwrap();
 
-            assert!(pin.is_low().unwrap());
+            assert_eq!(true, pin.is_low().unwrap());
         }
 
         #[test]
@@ -277,7 +279,7 @@ mod test {
             let mut pin = Pin::new();
             pin.set_high().unwrap();
 
-            assert!(pin.is_high().unwrap());
+            assert_eq!(true, pin.is_high().unwrap());
         }
     }
 
@@ -296,13 +298,13 @@ mod test {
             #[test]
             fn returns_false_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert!(!pin.is_set_low().unwrap());
+                assert_eq!(false, pin.is_set_low().unwrap());
             }
 
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::Low);
-                assert!(pin.is_set_low().unwrap());
+                assert_eq!(true, pin.is_set_low().unwrap());
             }
         }
 
@@ -312,13 +314,13 @@ mod test {
             #[test]
             fn returns_true_when_state_is_high() {
                 let mut pin = Pin::with_state(State::High);
-                assert!(pin.is_set_high().unwrap());
+                assert_eq!(true, pin.is_set_high().unwrap());
             }
 
             #[test]
             fn returns_false_when_state_is_low() {
                 let mut pin = Pin::with_state(State::Low);
-                assert!(!pin.is_set_high().unwrap());
+                assert_eq!(false, pin.is_set_high().unwrap());
             }
         }
 
@@ -330,7 +332,7 @@ mod test {
             fn default_toggleable_impl() {
                 let mut pin = Pin::with_state(State::Low);
                 pin.toggle().unwrap();
-                assert!(pin.is_set_high().unwrap());
+                assert_eq!(true, pin.is_set_high().unwrap());
             }
         }
     }
