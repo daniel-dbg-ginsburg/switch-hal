@@ -35,14 +35,14 @@ mod input_pin {
     #[test]
     fn active_high() {
         let pin = Pin::with_state(State::High);
-        let mut switch = pin.into_active_high_switch();
+        let switch = pin.into_active_high_switch();
         assert!(switch.is_active().unwrap());
     }
 
     #[test]
     fn active_low() {
         let pin = Pin::with_state(State::Low);
-        let mut switch = pin.into_active_low_switch();
+        let switch = pin.into_active_low_switch();
         assert!(switch.is_active().unwrap());
     }
 }

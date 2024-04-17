@@ -49,7 +49,7 @@ pub trait InputSwitch {
     ///     Err(_) => { panic!("Failed to read button state"); }
     /// }
     /// ```
-    fn is_active(&mut self) -> Result<bool, Self::Error>;
+    fn is_active(&self) -> Result<bool, Self::Error>;
 }
 
 #[cfg(feature = "async")]
@@ -161,7 +161,7 @@ pub struct ActiveHigh;
 /// Zero sized struct for signaling to [Switch](struct.Switch.html) that it is active low
 pub struct ActiveLow;
 
-use core::marker::PhantomData;
+use core::{cell::RefCell, marker::PhantomData};
 
 /// Concrete implementation for [InputSwitch](trait.InputSwitch.html) and [OutputSwitch](trait.OutputSwitch.html)
 ///
@@ -171,7 +171,7 @@ use core::marker::PhantomData;
 ///     `ActiveLevel` is not actually stored in the struct.
 ///     It's [PhantomData] used to indicate which implementation to use.
 pub struct Switch<IoPin, ActiveLevel> {
-    pin: IoPin,
+    pin: RefCell<IoPin>,
     active: PhantomData<ActiveLevel>,
 }
 
@@ -222,7 +222,7 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
     /// ```
     pub fn new(pin: IoPin) -> Self {
         Switch {
-            pin,
+            pin: RefCell::new(pin),
             active: PhantomData::<ActiveLevel>,
         }
     }
@@ -243,7 +243,7 @@ impl<IoPin, ActiveLevel> Switch<IoPin, ActiveLevel> {
     /// // do something else with the pin
     /// ```
     pub fn into_pin(self) -> IoPin {
-        self.pin
+        self.pin.into_inner()
     }
 }
 

@@ -8,11 +8,11 @@ impl<T: OutputPin> OutputSwitch for Switch<T, ActiveHigh> {
     type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
-        self.pin.set_high()
+        self.pin.borrow_mut().set_high()
     }
 
     fn off(&mut self) -> Result<(), Self::Error> {
-        self.pin.set_low()
+        self.pin.borrow_mut().set_low()
     }
 }
 
@@ -20,11 +20,11 @@ impl<T: OutputPin> OutputSwitch for Switch<T, ActiveLow> {
     type Error = <T as ErrorType>::Error;
 
     fn on(&mut self) -> Result<(), Self::Error> {
-        self.pin.set_low()
+        self.pin.borrow_mut().set_low()
     }
 
     fn off(&mut self) -> Result<(), Self::Error> {
-        self.pin.set_high()
+        self.pin.borrow_mut().set_high()
     }
 }
 
@@ -34,7 +34,7 @@ impl<T: OutputPin + StatefulOutputPin, ActiveLevel> ToggleableOutputSwitch
     type Error = <T as ErrorType>::Error;
 
     fn toggle(&mut self) -> Result<(), Self::Error> {
-        self.pin.toggle()
+        self.pin.get_mut().toggle()
     }
 }
 
@@ -42,11 +42,11 @@ impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch for Switch<T, Active
     type Error = <T as ErrorType>::Error;
 
     fn is_on(&mut self) -> Result<bool, Self::Error> {
-        self.pin.is_set_low()
+        self.pin.get_mut().is_set_low()
     }
 
     fn is_off(&mut self) -> Result<bool, Self::Error> {
-        self.pin.is_set_high()
+        self.pin.get_mut().is_set_high()
     }
 }
 
@@ -54,10 +54,10 @@ impl<T: OutputPin + StatefulOutputPin> StatefulOutputSwitch for Switch<T, Active
     type Error = <T as ErrorType>::Error;
 
     fn is_on(&mut self) -> Result<bool, Self::Error> {
-        self.pin.is_set_high()
+        self.pin.get_mut().is_set_high()
     }
 
     fn is_off(&mut self) -> Result<bool, Self::Error> {
-        self.pin.is_set_low()
+        self.pin.get_mut().is_set_low()
     }
 }
