@@ -1,3 +1,4 @@
+#![allow(clippy::bool_assert_comparison)]
 extern crate switch_hal;
 
 use switch_hal::mock;
@@ -15,7 +16,7 @@ mod active_high_switch {
         led.on().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_high().unwrap());
+        assert_eq!(true, pin.is_high().unwrap());
     }
 
     #[test]
@@ -26,7 +27,7 @@ mod active_high_switch {
         led.off().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_low().unwrap());
+        assert_eq!(true, pin.is_low().unwrap());
     }
 
     #[test]
@@ -41,7 +42,7 @@ mod active_high_switch {
         led.toggle().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_high().unwrap());
+        assert_eq!(true, pin.is_high().unwrap());
     }
 
     #[test]
@@ -53,10 +54,10 @@ mod active_high_switch {
         let mut led = Switch::<_, ActiveHigh>::new(pin);
         led.off().unwrap();
 
-        assert!(!led.is_on().unwrap());
+        assert_eq!(false, led.is_on().unwrap());
 
         let mut pin = led.into_pin();
-        assert!(!pin.is_high().unwrap());
+        assert_eq!(false, pin.is_high().unwrap());
     }
 
     #[test]
@@ -68,10 +69,10 @@ mod active_high_switch {
         let mut led = Switch::<_, ActiveHigh>::new(pin);
         led.on().unwrap();
 
-        assert!(led.is_on().unwrap());
+        assert_eq!(true, led.is_on().unwrap());
 
         let mut pin = led.into_pin();
-        assert!(pin.is_high().unwrap());
+        assert_eq!(true, pin.is_high().unwrap());
     }
 }
 
@@ -88,7 +89,7 @@ mod active_low_switch {
         led.on().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_low().unwrap());
+        assert_eq!(true, pin.is_low().unwrap());
     }
 
     #[test]
@@ -99,7 +100,7 @@ mod active_low_switch {
         led.off().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_high().unwrap());
+        assert_eq!(true, pin.is_high().unwrap());
     }
 
     #[test]
@@ -114,7 +115,7 @@ mod active_low_switch {
         led.toggle().unwrap();
 
         let mut pin = led.into_pin();
-        assert!(pin.is_low().unwrap());
+        assert_eq!(true, pin.is_low().unwrap());
     }
 
     #[test]
@@ -126,10 +127,10 @@ mod active_low_switch {
         let mut led = Switch::<_, ActiveLow>::new(pin);
         led.off().unwrap();
 
-        assert!(!led.is_on().unwrap());
+        assert_eq!(false, led.is_on().unwrap());
 
         let mut pin = led.into_pin();
-        assert!(!pin.is_low().unwrap());
+        assert_eq!(false, pin.is_low().unwrap());
     }
 
     #[test]
@@ -141,9 +142,9 @@ mod active_low_switch {
         let mut led = Switch::<_, ActiveLow>::new(pin);
         led.on().unwrap();
 
-        assert!(led.is_on().unwrap());
+        assert_eq!(true, led.is_on().unwrap());
 
         let mut pin = led.into_pin();
-        assert!(pin.is_low().unwrap());
+        assert_eq!(true, pin.is_low().unwrap());
     }
 }

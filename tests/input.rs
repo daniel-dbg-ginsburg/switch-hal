@@ -1,3 +1,4 @@
+#![allow(clippy::bool_assert_comparison)]
 extern crate switch_hal;
 
 use switch_hal::mock::{Pin, State};
@@ -16,7 +17,7 @@ mod active_high_switch {
             let pin = Pin::with_state(State::High);
 
             let button = Switch::<_, ActiveHigh>::new(pin);
-            assert!(button.is_active().unwrap());
+            assert_eq!(true, button.is_active().unwrap());
         }
 
         #[test]
@@ -24,7 +25,7 @@ mod active_high_switch {
             let pin = Pin::with_state(State::Low);
 
             let button = Switch::<_, ActiveHigh>::new(pin);
-            assert!(!button.is_active().unwrap());
+            assert_eq!(false, button.is_active().unwrap());
         }
 
         #[test]
@@ -51,7 +52,7 @@ mod active_low_switch {
             let pin = Pin::with_state(State::High);
 
             let button = Switch::<_, ActiveLow>::new(pin);
-            assert!(!button.is_active().unwrap());
+            assert_eq!(false, button.is_active().unwrap());
         }
 
         #[test]
@@ -59,7 +60,7 @@ mod active_low_switch {
             let pin = Pin::with_state(State::Low);
 
             let button = Switch::<_, ActiveLow>::new(pin);
-            assert!(button.is_active().unwrap());
+            assert_eq!(true, button.is_active().unwrap());
         }
 
         #[test]
